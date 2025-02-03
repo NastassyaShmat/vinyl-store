@@ -23,8 +23,8 @@ export class RecordRepository {
     return this.recordsRepository.findOneBy({ id });
   }
 
-  async updateOne(id: number, updateUserDto: UpdateRecordDto): Promise<void> {
-    await this.recordsRepository.update(id, updateUserDto);
+  async updateOne(id: number, updateRecordDto: UpdateRecordDto): Promise<void> {
+    await this.recordsRepository.update(id, updateRecordDto);
   }
 
   async remove(id: number): Promise<void> {
