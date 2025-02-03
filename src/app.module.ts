@@ -1,6 +1,8 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
+import { DataSource } from 'typeorm';
+
 import { LoggerMiddleware } from './middlewares/logger.middleware';
 
 import { AppController } from './app.controller';
@@ -18,7 +20,6 @@ import { CommentsModule } from './comments/comments.module';
 import { Comment } from './comments/entities/comment.entity';
 import { RatingsModule } from './ratings/ratings.module';
 import { Rating } from './ratings/entities/rating.entity';
-import { DataSource } from 'typeorm'
 
 @Module({
   imports: [
@@ -44,6 +45,7 @@ import { DataSource } from 'typeorm'
 })
 export class AppModule implements NestModule {
   constructor(private dataSource: DataSource) {}
+
   configure(consumer: MiddlewareConsumer) {
     consumer.apply(LoggerMiddleware).forRoutes('*');
   }
