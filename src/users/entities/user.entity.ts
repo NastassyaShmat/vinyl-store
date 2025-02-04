@@ -45,15 +45,15 @@ export class User {
   })
   role: UserRole;
 
-  @OneToMany((type) => Comment, (comment) => comment.id)
+  @OneToMany(() => Comment, (comment) => comment.id)
   comments: Comment[];
 
-  @OneToMany((type) => Rating, (rating) => rating.id)
+  @OneToMany(() => Rating, (rating) => rating.id)
   ratings: Rating[];
 
-  @OneToMany((type) => Record, (record) => record.id, { onDelete: 'CASCADE' })
+  @OneToMany(() => Record, (record) => record.id, { onDelete: 'CASCADE' })
   records: Record[];
 
-  @OneToMany((type) => Order, (order) => order.id, { onDelete: 'CASCADE' })
+  @OneToMany(() => Order, (order) => order.id, { onDelete: 'CASCADE' })
   orders: Order[];
 }
