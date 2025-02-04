@@ -20,6 +20,8 @@ export class CreateUserDto {
 
   @ApiProperty()
   @IsString()
-  @MinLength(8)
+  @MinLength(8, {
+    message: 'Password is too short',
+  })
   readonly password: string;
 }

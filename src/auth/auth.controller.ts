@@ -6,7 +6,7 @@ import { LocalAuthGuard } from './guards/local-auth.guard';
 import { AuthService } from './auth.service';
 
 import { SignInDto } from './dto/sign-in.dto';
-import { UpdateAuthDto } from './dto/update-auth.dto';
+import { SignUpDto } from './dto/sign-up.dto';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -15,13 +15,14 @@ export class AuthController {
 
   @UseGuards(LocalAuthGuard)
   @Post('login')
-  login(@Body() sinInDto: SignInDto, @Req() req) {
+  login(@Req() req, @Body() signInDto: SignInDto) {
     return req['user'];
   }
 
-  @Get()
-  findAll() {
-    return this.authService.findAll();
+  @Post()
+  async register(@Body() signUpDto: SignUpDto): Promise<{ status: string }> {
+    await this.authService.register(signUpDto);
+    return { status: 'Success' };
   }
 
   @Get(':id')
