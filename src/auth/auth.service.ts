@@ -1,11 +1,21 @@
 import { Injectable } from '@nestjs/common';
-import { CreateAuthDto } from './dto/create-auth.dto';
+
+import { User } from 'src/users/entities/user.entity';
+import { UsersService } from 'src/users/users.service';
+
 import { UpdateAuthDto } from './dto/update-auth.dto';
 
 @Injectable()
 export class AuthService {
-  create(createAuthDto: CreateAuthDto) {
-    return 'This action adds a new auth';
+  constructor(private readonly usersService: UsersService) {}
+
+  async validateUser(username: string, pass: string): Promise<any> {
+    const user: User = await this.usersService.findOneByEmail(username);
+    if (user && user.password === pass) {
+      const { password, ...result } = user;
+      return result;
+    }
+    return null;
   }
 
   findAll() {
