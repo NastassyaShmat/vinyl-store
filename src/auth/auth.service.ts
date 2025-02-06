@@ -1,12 +1,12 @@
 import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 
+import { Crypto } from 'src/utils/crypto.service';
 import { User } from 'src/users/entities/user.entity';
 import { UsersService } from 'src/users/users.service';
 
 import { SignUpDto } from './dto/sign-up.dto';
-import { Crypto } from 'src/utils/crypto.service';
-import { use } from 'passport';
+import { JwtPayload } from './dto/jwt-payload.dto';
 
 @Injectable()
 export class AuthService {
@@ -37,19 +37,23 @@ export class AuthService {
     return user;
   }
 
-  findAll() {
-    return `This action returns all auth`;
+  async verifyPayload(payload: JwtPayload): Promise<User> {
+    let user: User;
+    try {
+      user = await this.usersService.findOneByEmail(payload.sub);
+    } catch (error) {
+      throw new UnauthorizedException(`User with email: ${payload.sub} does not exist.`);
+    }
+    user.password = undefined;
+
+    return user;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} auth`;
-  }
+  signToken(username: string): string {
+    const payload: { sub: string } = {
+      sub: username,
+    };
 
-  update(id: number, updateAuthDto: UpdateAuthDto) {
-    return `This action updates a #${id} auth`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} auth`;
+    return this.jwtService.sign(payload);
   }
 }
