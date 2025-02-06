@@ -1,10 +1,12 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 
 import { User } from 'src/users/entities/user.entity';
 import { UsersService } from 'src/users/users.service';
 
 import { SignUpDto } from './dto/sign-up.dto';
+import { Crypto } from 'src/utils/crypto.service';
+import { use } from 'passport';
 
 @Injectable()
 export class AuthService {
@@ -22,15 +24,17 @@ export class AuthService {
     return this.usersService.create(signUpDto);
   }
 
-  // have to check pass and is valid email (skip it now) and return user or necessary users fields
-  // but before this have to add before save hook into entity schema which will create a hash from password and several functions to check is password valid
   async validateUser(username: string, pass: string): Promise<any> {
     const user: User = await this.usersService.findOneByEmail(username);
-    if (user && user.password === pass) {
-      const { password, ...result } = user;
-      return result;
+
+    if (!user) {
+      throw new UnauthorizedException(`User with email ${username} does not exist.`);
     }
-    return null;
+
+    if (!(await Crypto.verifyEncryptedWithOriginal(user.password, pass))) {
+      throw new UnauthorizedException('Password is not valid');
+    }
+    return user;
   }
 
   findAll() {
