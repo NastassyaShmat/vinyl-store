@@ -1,7 +1,8 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { BeforeInsert, BeforeUpdate, Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { IsEmail } from 'class-validator';
 
 import { UserRole } from 'src/enums';
+import { Crypto } from 'src/utils/crypto.service';
 import { Comment } from 'src/comments/entities/comment.entity';
 import { Order } from 'src/orders/entities/order.entity';
 import { Rating } from 'src/ratings/entities/rating.entity';
@@ -37,6 +38,9 @@ export class User {
   @Column({ type: 'varchar', name: 'password', length: 255 })
   password: string;
 
+  @Column({ type: 'boolean', name: 'is_verified', default: false, nullable: false })
+  isVerified: boolean;
+
   @Column({
     type: 'enum',
     name: 'role',
@@ -56,4 +60,12 @@ export class User {
 
   @OneToMany(() => Order, (order) => order.id, { onDelete: 'CASCADE' })
   orders: Order[];
+
+  @BeforeInsert()
+  @BeforeUpdate()
+  async hashPassword() {
+    if (this.password.length) {
+      this.password = await Crypto.getEncryptedString(this.password);
+    }
+  }
 }

@@ -15,6 +15,7 @@ async function bootstrap() {
     .setDescription('The Vinyl Store API description')
     .setVersion('1.0')
     .addTag('Auth')
+    .addTag('Users')
     .build();
 
   const documentFactory = () => SwaggerModule.createDocument(app, config);

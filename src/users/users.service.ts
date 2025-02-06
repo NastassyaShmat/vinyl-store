@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 
+import { User } from './entities/user.entity';
 import { UsersRepository } from './users.repository';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -8,15 +9,15 @@ import { UpdateUserDto } from './dto/update-user.dto';
 export class UsersService {
   constructor(private readonly usersRepository: UsersRepository) {}
 
-  create(createUserDto: CreateUserDto) {
-    return 'This action adds a new record';
+  create(createUserDto: CreateUserDto): Promise<User> {
+    return this.usersRepository.create(createUserDto);
   }
 
   findAll() {
     return `This action returns all records`;
   }
 
-  findOneByEmail(email: string) {
+  async findOneByEmail(email: string): Promise<User> {
     return this.usersRepository.findOneByEmail(email);
   }
 
