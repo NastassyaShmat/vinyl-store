@@ -19,7 +19,7 @@ export class AuthController {
     return req['user'];
   }
 
-  @Post()
+  @Post('register')
   async register(@Body() signUpDto: SignUpDto): Promise<{ status: string }> {
     await this.authService.register(signUpDto);
     return { status: 'Success' };

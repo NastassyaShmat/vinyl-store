@@ -48,12 +48,4 @@ export class AuthService {
 
     return user;
   }
-
-  signToken(username: string): string {
-    const payload: { sub: string } = {
-      sub: username,
-    };
-
-    return this.jwtService.sign(payload);
-  }
 }
