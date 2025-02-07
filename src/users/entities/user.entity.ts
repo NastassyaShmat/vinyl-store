@@ -30,10 +30,10 @@ export class User {
   @Column({ type: 'varchar', name: 'last_name', length: 50, nullable: false })
   lastName: string;
 
-  @Column({ type: 'varchar', name: 'phone_number', length: 10 })
+  @Column({ type: 'varchar', name: 'phone_number', length: 15 })
   phoneNumber: string;
 
-  @Column({ type: 'varchar', name: 'birth_date', length: 10 })
+  @Column({ type: 'varchar', name: 'birth_date', length: 12 })
   birthDate: string;
 
   @Column({ type: 'varchar', name: 'password', length: 255 })

@@ -35,7 +35,7 @@ import { AuthModule } from './auth/auth.module';
         password: configService.get<string>('DB_PASSWORD'),
         database: configService.get<string>('DB_NAME'),
         entities: [User, Record, Order, OrderItem, Comment, Rating],
-        synchronize: false,
+        synchronize: true,
       }),
     }),
     RecordsModule,
