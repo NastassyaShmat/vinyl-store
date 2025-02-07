@@ -1,10 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsDate } from 'class-validator';
+import { IsDateString } from 'class-validator';
 
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
 
 export class SignUpDto extends CreateUserDto {
   @ApiProperty()
-  @IsDate()
+  @IsDateString()
   readonly birthDate: string;
 }
