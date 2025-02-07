@@ -2,6 +2,7 @@ import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from '@nes
 import { JwtService } from '@nestjs/jwt';
 
 import { Response } from 'express';
+import { instanceToPlain } from 'class-transformer';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
@@ -27,7 +28,7 @@ export class TokenInterceptor implements NestInterceptor {
           secure: process.env.NODE_ENV === 'production',
         });
 
-        return { ...user, access_token };
+        return { ...instanceToPlain(user), access_token };
       }),
     );
   }
