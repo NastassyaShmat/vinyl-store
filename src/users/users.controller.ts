@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Patch } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 
 import { User } from './entities/user.entity';
@@ -18,18 +18,21 @@ export class UsersController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: number): Promise<User> {
-    return this.usersService.findOne(+id);
+  findOne(@Param('id', ParseIntPipe) id: number): Promise<User> {
+    return this.usersService.findOne(id);
   }
 
   @Patch(':id')
-  async update(@Param('id') id: number, @Body() updateUserDto: UpdateUserDto): Promise<{ status: string }> {
+  async update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateUserDto: UpdateUserDto,
+  ): Promise<{ status: string }> {
     await this.usersService.update(id, updateUserDto);
     return { status: 'Success' };
   }
 
   @Delete(':id')
-  async remove(@Param('id') id: number): Promise<{ status: string }> {
+  async remove(@Param('id', ParseIntPipe) id: number): Promise<{ status: string }> {
     await this.usersService.remove(id);
     return { status: 'Success' };
   }
