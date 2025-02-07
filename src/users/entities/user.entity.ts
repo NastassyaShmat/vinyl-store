@@ -1,5 +1,6 @@
 import { BeforeInsert, BeforeUpdate, Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { IsEmail } from 'class-validator';
+import { Exclude } from 'class-transformer';
 
 import { UserRole } from 'src/enums';
 import { Crypto } from 'src/utils/crypto.service';
@@ -36,6 +37,7 @@ export class User {
   birthDate: string;
 
   @Column({ type: 'varchar', name: 'password', length: 255 })
+  @Exclude()
   password: string;
 
   @Column({ type: 'boolean', name: 'is_verified', default: false, nullable: false })
