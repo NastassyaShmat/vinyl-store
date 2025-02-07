@@ -25,13 +25,13 @@ export class Record {
   @Column({ type: 'varchar', name: 'genre', length: 255, nullable: false })
   genre: string;
 
-  @Column({ type: 'integer', name: 'released_year' })
+  @Column({ type: 'integer', name: 'released_year', nullable: false })
   releasedYear: number;
 
-  @Column({ type: 'varchar', name: 'image' })
+  @Column({ type: 'varchar', name: 'image', nullable: true })
   image: string;
 
-  @Column({ type: 'varchar', name: 'description', length: 500 })
+  @Column({ type: 'varchar', name: 'description', length: 500, nullable: true })
   description: string;
 
   @OneToMany((type) => Comment, (comment) => comment.id, {
