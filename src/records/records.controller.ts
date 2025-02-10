@@ -10,13 +10,20 @@ import {
   HttpStatus,
   HttpCode,
   ParseIntPipe,
+  UseGuards,
 } from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 
 import { Record } from './entities/record.entity';
 import { RecordsService } from './records.service';
 import { CreateRecordDto } from './dto/create-record.dto';
 import { UpdateRecordDto } from './dto/update-record.dto';
 
+@ApiTags('Records')
+@UseGuards(JwtAuthGuard)
+@ApiBearerAuth()
 @Controller('records')
 export class RecordsController {
   constructor(private readonly recordsService: RecordsService) {}
