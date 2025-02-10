@@ -20,6 +20,7 @@ export class UsersRepository {
   findAll(): Promise<User[]> {
     return this.usersRepository.find({
       select: {
+        id: true,
         firstName: true,
         lastName: true,
       },
@@ -40,6 +41,7 @@ export class UsersRepository {
     const user: User = await this.usersRepository.findOne({
       where: { id },
       select: {
+        id: true,
         firstName: true,
         lastName: true,
       },
