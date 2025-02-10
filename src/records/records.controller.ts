@@ -24,7 +24,8 @@ export class RecordsController {
   @Post()
   @HttpCode(HttpStatus.CREATED)
   create(@Req() req: Request, @Body() createRecordDto: CreateRecordDto): Promise<Record> {
-    return this.recordsService.create(createRecordDto);
+    const userId: number = req['user'];
+    return this.recordsService.create(userId, createRecordDto);
   }
 
   @Get()

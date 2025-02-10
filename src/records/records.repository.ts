@@ -3,6 +3,8 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 
 import { DeleteResult, Repository, UpdateResult } from 'typeorm';
 
+import { User } from 'src/users/entities/user.entity';
+
 import { Record } from './entities/record.entity';
 import { CreateRecordDto } from './dto/create-record.dto';
 import { UpdateRecordDto } from './dto/update-record.dto';
@@ -11,8 +13,10 @@ import { UpdateRecordDto } from './dto/update-record.dto';
 export class RecordsRepository {
   constructor(@InjectRepository(Record) private recordsRepository: Repository<Record>) {}
 
-  create(createRecordDto: CreateRecordDto): Promise<Record> {
-    return this.recordsRepository.save(createRecordDto);
+  async create(user: User, createRecordDto: CreateRecordDto): Promise<Record> {
+    const record: Record = await this.recordsRepository.create(createRecordDto);
+    record.user = user;
+    return this.recordsRepository.save(record);
   }
 
   // should to add to relations Comments and Rating
