@@ -20,11 +20,15 @@ import { AuthController } from './auth.controller';
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
         secret: configService.get<string>('JWT_SECRET'),
-        signOptions: { expiresIn: '7d' },
+        signOptions: { expiresIn: '7d', algorithm: 'HS384' },
+        verifyOptions: {
+          algorithms: ['HS384'],
+        },
       }),
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, LocalStrategy, JwtStrategy],
+  providers: [AuthService, ConfigService, LocalStrategy, JwtStrategy],
+  exports: [PassportModule, JwtModule],
 })
 export class AuthModule {}
