@@ -3,7 +3,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { DeleteResult, UpdateResult } from 'typeorm';
 
 import { User } from 'src/users/entities/user.entity';
-import { UsersRepository } from 'src/users/users.repository';
+import { UsersService } from 'src/users/users.service';
 
 import { Record } from './entities/record.entity';
 import { RecordsRepository } from './records.repository';
@@ -14,12 +14,12 @@ import { UpdateRecordDto } from './dto/update-record.dto';
 export class RecordsService {
   constructor(
     private readonly recordsRepository: RecordsRepository,
-    private readonly usersRepository: UsersRepository,
+    private readonly usersService: UsersService,
   ) {}
 
   //if createRecordDto contain an image have to implement upload image logic.
   async create(userId: number, createRecordDto: CreateRecordDto): Promise<Record> {
-    const user: User = await this.usersRepository.findOne(userId);
+    const user: User = await this.usersService.findOne(userId);
     if (!user) {
       throw new BadRequestException(`Can not create a record without user`);
     }
