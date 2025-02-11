@@ -41,6 +41,7 @@ export class RecordsRepository {
     const record = await this.recordsRepository.findOne({
       where: { id },
       select: {
+        id: true,
         title: true,
         artist: true,
         genre: true,

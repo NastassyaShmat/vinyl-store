@@ -9,7 +9,7 @@ export class Comment {
   id: number;
 
   @Column({ type: 'varchar', name: 'text', nullable: false })
-  text: number;
+  text: string;
 
   @Column({ type: 'date', name: 'date_posted', nullable: false })
   datePosted: Date;

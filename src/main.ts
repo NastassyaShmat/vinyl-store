@@ -33,6 +33,7 @@ async function bootstrap() {
     .addTag('auth')
     .addTag('users')
     .addTag('records')
+    .addTag('comments')
     .addTag('files')
     .addBearerAuth()
     .build();

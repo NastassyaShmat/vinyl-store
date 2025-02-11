@@ -1,26 +1,76 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
+
+import { DeleteResult, UpdateResult } from 'typeorm';
+
+import { Record } from 'src/records/entities/record.entity';
+import { RecordsService } from 'src/records/records.service';
+import { User } from 'src/users/entities/user.entity';
+import { UsersService } from 'src/users/users.service';
+
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
 
+import { Comment } from './entities/comment.entity';
+import { CommentsRepository } from './comments.repository';
+
 @Injectable()
 export class CommentsService {
-  create(createCommentDto: CreateCommentDto) {
-    return 'This action adds a new comment';
+  constructor(
+    private readonly recordService: RecordsService,
+    private readonly usersService: UsersService,
+    private readonly commentsRepository: CommentsRepository,
+  ) {}
+
+  async create(userId: number, id: number, createCommentDto: CreateCommentDto): Promise<Comment> {
+    const record: Record = await this.recordService.findOne(id);
+    const user: User = await this.usersService.findOne(userId);
+
+    if (!record) {
+      throw new BadRequestException(`Record should be defined.`);
+    }
+    if (!user) {
+      throw new BadRequestException(`User should be defined.`);
+    }
+
+    const createCommentContent: CreateCommentDto & { user: User; record: Record; datePosted: Date } = {
+      ...createCommentDto,
+      datePosted: new Date(),
+      user,
+      record,
+    };
+
+    return this.commentsRepository.create(createCommentContent);
   }
 
-  findAll() {
-    return `This action returns all comments`;
+  findAll(userId: number): Promise<Comment[]> {
+    return this.commentsRepository.findAll(userId);
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} comment`;
+  findOne(id: number): Promise<Comment> {
+    return this.commentsRepository.findOne(id);
   }
 
-  update(id: number, updateCommentDto: UpdateCommentDto) {
-    return `This action updates a #${id} comment`;
+  private getUsersComment(userId: number, id: number): Promise<Comment> {
+    return this.commentsRepository.getUsersComment(userId, id);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} comment`;
+  async update(userId: number, id: number, updateCommentDto: UpdateCommentDto): Promise<UpdateResult> {
+    const commentToUpdate: Comment = await this.getUsersComment(userId, id);
+
+    if (!commentToUpdate) {
+      throw new BadRequestException(`User with id ${userId} can not update comment with id ${id}`);
+    }
+
+    return this.commentsRepository.updateOne(id, updateCommentDto);
+  }
+
+  async remove(userId: number, id: number): Promise<DeleteResult> {
+    const commentToDelete: Comment = await this.getUsersComment(userId, id);
+
+    if (!commentToDelete) {
+      throw new BadRequestException(`User with id ${userId} can not update comment with id ${id}`);
+    }
+
+    return this.commentsRepository.remove(userId, id);
   }
 }
