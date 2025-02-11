@@ -30,8 +30,10 @@ async function bootstrap() {
     .setTitle('Vinyl Store')
     .setDescription('The Vinyl Store API description')
     .setVersion('1.0')
-    .addTag('Auth')
-    .addTag('Users')
+    .addTag('auth')
+    .addTag('users')
+    .addTag('records')
+    .addTag('files')
     .addBearerAuth()
     .build();
 

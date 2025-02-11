@@ -7,7 +7,7 @@ import { User } from './entities/user.entity';
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 
-@ApiTags('Users')
+@ApiTags('users')
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
 @Controller('users')

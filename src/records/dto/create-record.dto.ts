@@ -26,11 +26,6 @@ export class CreateRecordDto {
   readonly quantity: number;
 
   @ApiPropertyOptional()
-  @IsString()
-  @IsOptional()
-  readonly image: string;
-
-  @ApiPropertyOptional()
   @IsNumber()
   @IsPositive()
   @IsOptional()
