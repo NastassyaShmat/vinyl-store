@@ -17,14 +17,10 @@ import { UpdateCommentDto } from './dto/update-comment.dto';
 export class CommentsController {
   constructor(private readonly commentsService: CommentsService) {}
 
-  @Post(':id')
-  create(
-    @Req() req: Request,
-    @Param('id', ParseIntPipe) id: number,
-    @Body() createCommentDto: CreateCommentDto,
-  ): Promise<Comment> {
+  @Post()
+  create(@Req() req: Request, @Body() createCommentDto: CreateCommentDto): Promise<Comment> {
     const userId: number = req.user['id'];
-    return this.commentsService.create(userId, id, createCommentDto);
+    return this.commentsService.create(userId, createCommentDto);
   }
 
   @Get()

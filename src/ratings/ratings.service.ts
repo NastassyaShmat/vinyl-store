@@ -1,26 +1,45 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
+
+import { UsersService } from 'src/users/users.service';
+import { RecordsService } from 'src/records/records.service';
+import { User } from 'src/users/entities/user.entity';
+import { Record } from 'src/records/entities/record.entity';
+
+import { Rating } from './entities/rating.entity';
+import { RatingsRepository } from './ratings.repository';
+
 import { CreateRatingDto } from './dto/create-rating.dto';
-import { UpdateRatingDto } from './dto/update-rating.dto';
 
 @Injectable()
 export class RatingsService {
-  create(createRatingDto: CreateRatingDto) {
-    return 'This action adds a new rating';
+  constructor(
+    private readonly recordService: RecordsService,
+    private readonly usersService: UsersService,
+    private readonly ratingsRepository: RatingsRepository,
+  ) {}
+
+  async create(userId: number, createRatingDto: CreateRatingDto): Promise<Rating> {
+    const record: Record = await this.recordService.findOne(createRatingDto.recordId);
+    const user: User = await this.usersService.findOne(userId);
+
+    if (!record) {
+      throw new BadRequestException(`Record should be defined.`);
+    }
+    if (!user) {
+      throw new BadRequestException(`User should be defined.`);
+    }
+
+    const createRatingContent: CreateRatingDto & { user: User; record: Record; datePosted: Date } = {
+      ...createRatingDto,
+      datePosted: new Date(),
+      user,
+      record,
+    };
+
+    return this.ratingsRepository.create(createRatingContent);
   }
 
-  findAll() {
-    return `This action returns all ratings`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} rating`;
-  }
-
-  update(id: number, updateRatingDto: UpdateRatingDto) {
-    return `This action updates a #${id} rating`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} rating`;
+  findAll(userId: number): Promise<Rating[]> {
+    return this.ratingsRepository.findAll(userId);
   }
 }
