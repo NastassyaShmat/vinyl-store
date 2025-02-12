@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 
 import { DeleteResult, UpdateResult } from 'typeorm';
 
@@ -23,7 +23,12 @@ export class RecordsService {
     if (!user) {
       throw new BadRequestException(`Can not create a record without user`);
     }
-    return this.recordsRepository.create(user, createRecordDto);
+
+    const createRecordContent: CreateRecordDto & { user: User } = {
+      ...createRecordDto,
+      user,
+    };
+    return this.recordsRepository.create(createRecordContent);
   }
 
   // should implement download image logic
@@ -37,7 +42,12 @@ export class RecordsService {
   }
 
   // should implement download image logic
-  update(id: number, updateRecordDto: UpdateRecordDto): Promise<UpdateResult> {
+  async update(id: number, updateRecordDto: UpdateRecordDto): Promise<UpdateResult> {
+    const record = await this.recordsRepository.findOne(id);
+
+    if (!record) {
+      throw new NotFoundException(`Record with identifier ${id} does not exist.`);
+    }
     return this.recordsRepository.updateOne(id, updateRecordDto);
   }
 
