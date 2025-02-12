@@ -21,8 +21,8 @@ export class CommentsService {
     private readonly commentsRepository: CommentsRepository,
   ) {}
 
-  async create(userId: number, id: number, createCommentDto: CreateCommentDto): Promise<Comment> {
-    const record: Record = await this.recordService.findOne(id);
+  async create(userId: number, createCommentDto: CreateCommentDto): Promise<Comment> {
+    const record: Record = await this.recordService.findOne(createCommentDto.recordId);
     const user: User = await this.usersService.findOne(userId);
 
     if (!record) {
