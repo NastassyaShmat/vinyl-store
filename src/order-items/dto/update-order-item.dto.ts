@@ -1,4 +1,19 @@
-import { PartialType } from '@nestjs/swagger';
-import { CreateOrderItemDto } from './create-order-item.dto';
+import { ApiProperty } from '@nestjs/swagger';
+import { IsNumber, IsPositive, Min } from 'class-validator';
+export class UpdateOrderItemDto {
+  @ApiProperty()
+  @IsNumber()
+  @IsPositive()
+  @Min(1)
+  readonly orderItemQuantity: number;
 
-export class UpdateOrderItemDto extends PartialType(CreateOrderItemDto) {}
+  @ApiProperty()
+  @IsNumber()
+  @IsPositive()
+  readonly orderItemId: number;
+
+  @ApiProperty()
+  @IsNumber()
+  @IsPositive()
+  readonly recordId: number;
+}

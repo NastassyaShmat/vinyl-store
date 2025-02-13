@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 
-import { DeleteResult, UpdateResult } from 'typeorm';
+import { DeleteResult, In, UpdateResult } from 'typeorm';
 
 import { User } from 'src/users/entities/user.entity';
 import { UsersService } from 'src/users/users.service';
@@ -34,6 +34,11 @@ export class RecordsService {
   // should implement download image logic
   findAll(): Promise<Record[]> {
     return this.recordsRepository.findAll();
+  }
+
+  // to get records with orderItems id
+  find(recordIds: number[]): Promise<Record[]> {
+    return this.recordsRepository.find(recordIds);
   }
 
   // should implement download image logic

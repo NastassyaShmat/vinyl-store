@@ -1,7 +1,8 @@
-import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
 import { Order } from 'src/orders/entities/order.entity';
 import { Record } from 'src/records/entities/record.entity';
+import { User } from 'src/users/entities/user.entity';
 
 @Entity({ name: 'order_items' })
 export class OrderItem {
@@ -17,9 +18,12 @@ export class OrderItem {
   @Column({ type: 'date', name: 'order_date', nullable: false })
   date: Date;
 
-  @OneToMany((type) => Record, (record) => record.id)
-  records: Record[];
+  @ManyToOne((type) => Record, (record) => record.id)
+  record: Record;
 
   @ManyToOne((type) => Order, (order) => order.id)
   order: Order;
+
+  @ManyToOne((type) => User, (user) => user.id)
+  user: User;
 }

@@ -8,6 +8,7 @@ import { Comment } from 'src/comments/entities/comment.entity';
 import { Order } from 'src/orders/entities/order.entity';
 import { Rating } from 'src/ratings/entities/rating.entity';
 import { Record } from 'src/records/entities/record.entity';
+import { OrderItem } from 'src/order-items/entities/order-item.entity';
 
 @Entity({ name: 'users' })
 export class User {
@@ -62,6 +63,9 @@ export class User {
 
   @OneToMany(() => Order, (order) => order.id, { onDelete: 'CASCADE' })
   orders: Order[];
+
+  @OneToMany(() => OrderItem, (orderItem) => orderItem.id, { onDelete: 'CASCADE' })
+  orderItems: OrderItem[];
 
   @BeforeInsert()
   @BeforeUpdate()

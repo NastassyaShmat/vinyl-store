@@ -1,4 +1,4 @@
-import { Column, Entity, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 import { Comment } from 'src/comments/entities/comment.entity';
 import { Rating } from 'src/ratings/entities/rating.entity';
@@ -45,6 +45,6 @@ export class Record {
   @ManyToOne((type) => User, (user) => user.id)
   user: User;
 
-  @ManyToMany((type) => OrderItem, (orderItem) => orderItem.id)
+  @OneToMany((type) => OrderItem, (orderItem) => orderItem.id)
   orderItems: OrderItem[];
 }
