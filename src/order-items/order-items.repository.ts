@@ -1,5 +1,5 @@
 import { InjectRepository } from '@nestjs/typeorm';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 
 import { DataSource, DeleteResult, In, Repository } from 'typeorm';
 
@@ -25,12 +25,17 @@ export class OrderItemsRepository {
     await queryRunner.connect();
     await queryRunner.startTransaction();
     try {
-      await queryRunner.manager.save(createOrderItemContent);
+      if (createOrderItemContent.record.quantity - createOrderItemContent.quantity < 0) {
+        throw new BadRequestException(`Can not create Order Item with such quantity`);
+      }
 
+      await queryRunner.manager.save(orderItem);
       await queryRunner.manager
         .createQueryBuilder()
         .update(Record)
-        .set({ quantity: createOrderItemContent.record.quantity - createOrderItemContent.quantity })
+        .set({
+          quantity: createOrderItemContent.record.quantity - createOrderItemContent.quantity,
+        })
         .where('id = :id', { id: createOrderItemContent.recordId })
         .execute();
 
@@ -54,6 +59,16 @@ export class OrderItemsRepository {
       order: { date: 'ASC' },
       skip: 0,
       take: 10,
+    });
+  }
+
+  find(orderItemIds: number[]): Promise<OrderItem[]> {
+    return this.orderItemsRepository.find({
+      where: {
+        id: In(orderItemIds),
+      },
+      relations: { record: true },
+      select: { quantity: true },
     });
   }
 
@@ -81,6 +96,10 @@ export class OrderItemsRepository {
     await queryRunner.startTransaction();
     try {
       for (const orderItem of updateOrderItemContent) {
+        if (orderItem.recordQuantity < 0) {
+          throw new BadRequestException(`Can not create Order Item with such quantity`);
+        }
+
         await queryRunner.manager
           .createQueryBuilder()
           .update(OrderItem)
@@ -91,7 +110,7 @@ export class OrderItemsRepository {
         await queryRunner.manager
           .createQueryBuilder()
           .update(Record)
-          .set({ quantity: orderItem.recordQuantity - orderItem.orderItemQuantity })
+          .set({ quantity: orderItem.recordQuantity })
           .where('id = :id', { id: orderItem.recordId })
           .execute();
       }

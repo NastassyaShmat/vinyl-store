@@ -1,14 +1,18 @@
-import { Controller, Get, Post, Body, Patch, Param, Req, ParseIntPipe } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { Controller, Get, Post, Body, Patch, Param, Req, ParseIntPipe, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 import { Request } from 'express';
 
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+
 import { OrderItemsService } from './order-items.service';
 import { CreateOrderItemDto } from './dto/create-order-item.dto';
-import { UpdateOrderItemDto } from './dto/update-order-item.dto';
+import { BulkUpdateOrderItemsDto } from './dto/update-order-item.dto';
 import { DeleteOrderItemsDto } from './dto/delete-order-item.dto';
 
 @ApiTags('order-items')
+@UseGuards(JwtAuthGuard)
+@ApiBearerAuth()
 @Controller('order-items')
 export class OrderItemsController {
   constructor(private readonly orderItemsService: OrderItemsService) {}
@@ -31,7 +35,7 @@ export class OrderItemsController {
   }
 
   @Patch()
-  async update(@Body() updateOrderItemDto: UpdateOrderItemDto[]): Promise<{ status: string }> {
+  async update(@Body() updateOrderItemDto: BulkUpdateOrderItemsDto): Promise<{ status: string }> {
     await this.orderItemsService.updateMany(updateOrderItemDto);
     return { status: 'Success' };
   }

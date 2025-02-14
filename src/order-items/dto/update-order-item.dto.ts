@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNumber, IsPositive, Min } from 'class-validator';
+import { Type } from 'class-transformer';
+import { IsNumber, IsPositive, Min, ValidateNested } from 'class-validator';
 export class UpdateOrderItemDto {
   @ApiProperty()
   @IsNumber()
@@ -16,4 +17,11 @@ export class UpdateOrderItemDto {
   @IsNumber()
   @IsPositive()
   readonly recordId: number;
+}
+
+export class BulkUpdateOrderItemsDto {
+  @ApiProperty({ type: [UpdateOrderItemDto] })
+  @Type(() => UpdateOrderItemDto)
+  @ValidateNested({ each: true })
+  orderItems: UpdateOrderItemDto[];
 }

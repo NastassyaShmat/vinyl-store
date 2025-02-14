@@ -12,7 +12,7 @@ import { OrderItem } from './entities/order-item.entity';
 
 import { DeleteOrderItemsDto } from './dto/delete-order-item.dto';
 import { CreateOrderItemDto } from './dto/create-order-item.dto';
-import { UpdateOrderItemDto } from './dto/update-order-item.dto';
+import { BulkUpdateOrderItemsDto, UpdateOrderItemDto } from './dto/update-order-item.dto';
 
 @Injectable()
 export class OrderItemsService {
@@ -53,13 +53,28 @@ export class OrderItemsService {
     return this.orderItemsRepository.findOne(id);
   }
 
-  async updateMany(updateOrderItemDto: UpdateOrderItemDto[]): Promise<void> {
-    const recordIds: number[] = updateOrderItemDto.map((orderItem) => orderItem.recordId);
+  async updateMany(updateOrderItemDto: BulkUpdateOrderItemsDto): Promise<void> {
+    const recordIds: number[] = updateOrderItemDto.orderItems.map((orderItem) => orderItem.recordId);
+    const orderItemIds: number[] = updateOrderItemDto.orderItems.map((orderItem) => orderItem.orderItemId);
     const recordsToUpdate: Record[] = await this.recordsService.find(recordIds);
+    const existingOrderItems: OrderItem[] = await this.orderItemsRepository.find(orderItemIds);
     const recordIdQuantityMap: Map<number, number> = new Map<number, number>();
+    const oldOrderItemIdQuantityMap: Map<number, number> = new Map<number, number>();
+    const newOrderItemIdQuantityMap: Map<number, number> = new Map<number, number>();
+
+    updateOrderItemDto.orderItems.forEach((orderItem) => {
+      newOrderItemIdQuantityMap.set(orderItem.recordId, orderItem.orderItemQuantity);
+    });
+
+    existingOrderItems.forEach((orderItem) => {
+      oldOrderItemIdQuantityMap.set(orderItem.record.id, orderItem.quantity);
+    });
 
     recordsToUpdate.forEach((record) => {
-      recordIdQuantityMap.set(record.id, record.quantity);
+      recordIdQuantityMap.set(
+        record.id,
+        oldOrderItemIdQuantityMap.get(record.id) + record.quantity - newOrderItemIdQuantityMap.get(record.id),
+      );
     });
 
     const updateOrderItemContent: Array<{
@@ -67,7 +82,7 @@ export class OrderItemsService {
       recordId: number;
       orderItemQuantity: number;
       recordQuantity: number;
-    }> = updateOrderItemDto.map((orderItem) => ({
+    }> = updateOrderItemDto.orderItems.map((orderItem) => ({
       ...orderItem,
       recordQuantity: recordIdQuantityMap.get(orderItem.recordId),
     }));

@@ -14,6 +14,8 @@ import {
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
+import { Request } from 'express';
+
 import { UserRole } from 'src/enums';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
@@ -35,7 +37,7 @@ export class RecordsController {
   @Roles(UserRole.ADMIN)
   @HttpCode(HttpStatus.CREATED)
   create(@Req() req: Request, @Body() createRecordDto: CreateRecordDto): Promise<Record> {
-    const userId: number = req['user'];
+    const userId: number = req.user['id'];
     return this.recordsService.create(userId, createRecordDto);
   }
 
