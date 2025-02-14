@@ -14,6 +14,6 @@ export class Rating {
   @ManyToOne((type) => User, (user) => user.id)
   user: User;
 
-  @ManyToOne((type) => Record, (record) => record.id)
+  @ManyToOne((type) => Record, (record) => record.id, { onDelete: 'CASCADE' })
   record: Record;
 }

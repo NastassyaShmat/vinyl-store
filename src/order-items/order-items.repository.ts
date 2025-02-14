@@ -1,33 +1,130 @@
 import { InjectRepository } from '@nestjs/typeorm';
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 
-import { Repository } from 'typeorm';
+import { DataSource, DeleteResult, In, Repository } from 'typeorm';
+
+import { Record } from 'src/records/entities/record.entity';
+import { User } from 'src/users/entities/user.entity';
 
 import { OrderItem } from './entities/order-item.entity';
-import { UpdateOrderItemDto } from './dto/update-order-item.dto';
 import { CreateOrderItemDto } from './dto/create-order-item.dto';
 
 @Injectable()
-export class RatingRepository {
-  constructor(@InjectRepository(OrderItem) private orderItemsRepository: Repository<OrderItem>) {}
+export class OrderItemsRepository {
+  constructor(
+    @InjectRepository(OrderItem) private orderItemsRepository: Repository<OrderItem>,
+    private readonly dataSource: DataSource,
+  ) {}
 
-  create(createOrderItemDto: CreateOrderItemDto) {
-    return this.orderItemsRepository.save(createOrderItemDto);
+  async create(
+    createOrderItemContent: CreateOrderItemDto & { user: User; record: Record; totalPrice: number; date: Date },
+  ): Promise<OrderItem> {
+    const orderItem: OrderItem = this.orderItemsRepository.create(createOrderItemContent);
+    const queryRunner = this.dataSource.createQueryRunner();
+
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+    try {
+      if (createOrderItemContent.record.quantity - createOrderItemContent.quantity < 0) {
+        throw new BadRequestException(`Can not create Order Item with such quantity`);
+      }
+
+      await queryRunner.manager.save(orderItem);
+      await queryRunner.manager
+        .createQueryBuilder()
+        .update(Record)
+        .set({
+          quantity: createOrderItemContent.record.quantity - createOrderItemContent.quantity,
+        })
+        .where('id = :id', { id: createOrderItemContent.recordId })
+        .execute();
+
+      await queryRunner.commitTransaction();
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      await queryRunner.release();
+    }
+    return orderItem;
   }
 
-  findAll(): Promise<OrderItem[]> {
-    return this.orderItemsRepository.find();
+  findAll(userId: number): Promise<OrderItem[]> {
+    return this.orderItemsRepository.find({
+      where: {
+        user: { id: userId },
+      },
+      relations: { record: true },
+      select: { totalPrice: true, quantity: true },
+      order: { date: 'ASC' },
+      skip: 0,
+      take: 10,
+    });
   }
 
-  findOne(id: number): Promise<OrderItem | null> {
-    return this.orderItemsRepository.findOneBy({ id });
+  find(orderItemIds: number[]): Promise<OrderItem[]> {
+    return this.orderItemsRepository.find({
+      where: {
+        id: In(orderItemIds),
+      },
+      relations: { record: true },
+      select: { quantity: true },
+    });
   }
 
-  async updateOne(id: number, updateOrderItemDto: UpdateOrderItemDto): Promise<void> {
-    await this.orderItemsRepository.update(id, updateOrderItemDto);
+  async findOne(id: number): Promise<OrderItem> {
+    const orderItem: OrderItem = await this.orderItemsRepository.findOneBy({ id });
+
+    if (!orderItem) {
+      throw new NotFoundException(`OrderItem with identifier ${id} does not exist.`);
+    }
+
+    return orderItem;
   }
 
-  async remove(id: number): Promise<void> {
-    await this.orderItemsRepository.delete(id);
+  async update(
+    updateOrderItemContent: Array<{
+      orderItemId: number;
+      recordId: number;
+      orderItemQuantity: number;
+      recordQuantity: number;
+    }>,
+  ): Promise<void> {
+    const queryRunner = this.dataSource.createQueryRunner();
+
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+    try {
+      for (const orderItem of updateOrderItemContent) {
+        if (orderItem.recordQuantity < 0) {
+          throw new BadRequestException(`Can not create Order Item with such quantity`);
+        }
+
+        await queryRunner.manager
+          .createQueryBuilder()
+          .update(OrderItem)
+          .set({ quantity: orderItem.orderItemQuantity })
+          .where('id = :id', { id: orderItem.orderItemId })
+          .execute();
+
+        await queryRunner.manager
+          .createQueryBuilder()
+          .update(Record)
+          .set({ quantity: orderItem.recordQuantity })
+          .where('id = :id', { id: orderItem.recordId })
+          .execute();
+      }
+
+      await queryRunner.commitTransaction();
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      await queryRunner.release();
+    }
+  }
+
+  remove(userId: number, ids: number[]): Promise<DeleteResult> {
+    return this.orderItemsRepository.delete({ id: In(ids), user: { id: userId } });
   }
 }

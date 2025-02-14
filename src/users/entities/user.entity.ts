@@ -8,6 +8,7 @@ import { Comment } from 'src/comments/entities/comment.entity';
 import { Order } from 'src/orders/entities/order.entity';
 import { Rating } from 'src/ratings/entities/rating.entity';
 import { Record } from 'src/records/entities/record.entity';
+import { OrderItem } from 'src/order-items/entities/order-item.entity';
 
 @Entity({ name: 'users' })
 export class User {
@@ -57,11 +58,14 @@ export class User {
   @OneToMany(() => Rating, (rating) => rating.id)
   ratings: Rating[];
 
-  @OneToMany(() => Record, (record) => record.id, { onDelete: 'CASCADE' })
+  @OneToMany(() => Record, (record) => record.id, { cascade: true })
   records: Record[];
 
-  @OneToMany(() => Order, (order) => order.id, { onDelete: 'CASCADE' })
+  @OneToMany(() => Order, (order) => order.id, { cascade: true })
   orders: Order[];
+
+  @OneToMany(() => OrderItem, (orderItem) => orderItem.id, { cascade: true })
+  orderItems: OrderItem[];
 
   @BeforeInsert()
   @BeforeUpdate()

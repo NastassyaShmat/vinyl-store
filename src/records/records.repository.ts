@@ -1,7 +1,7 @@
 import { InjectRepository } from '@nestjs/typeorm';
 import { Injectable, NotFoundException } from '@nestjs/common';
 
-import { DeleteResult, Repository, UpdateResult } from 'typeorm';
+import { DeleteResult, In, Repository, UpdateResult } from 'typeorm';
 
 import { Record } from './entities/record.entity';
 import { CreateRecordDto } from './dto/create-record.dto';
@@ -29,6 +29,18 @@ export class RecordsRepository {
       },
       skip: 0,
       take: 15,
+    });
+  }
+
+  // to get records with orderItems id
+  find(recordIds: number[]): Promise<Record[]> {
+    return this.recordsRepository.find({
+      where: { id: In(recordIds) },
+      select: {
+        id: true,
+        price: true,
+        quantity: true,
+      },
     });
   }
 

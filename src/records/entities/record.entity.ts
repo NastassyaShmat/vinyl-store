@@ -1,4 +1,4 @@
-import { Column, Entity, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 import { Comment } from 'src/comments/entities/comment.entity';
 import { Rating } from 'src/ratings/entities/rating.entity';
@@ -35,16 +35,16 @@ export class Record {
   description: string;
 
   @OneToMany((type) => Comment, (comment) => comment.id, {
-    onDelete: 'CASCADE',
+    cascade: true,
   })
   comments: Comment[];
 
-  @OneToMany((type) => Rating, (rating) => rating.id, { onDelete: 'CASCADE' })
+  @OneToMany((type) => Rating, (rating) => rating.id, { cascade: true })
   ratings: Rating[];
 
-  @ManyToOne((type) => User, (user) => user.id)
+  @ManyToOne((type) => User, (user) => user.id, { onDelete: 'CASCADE' })
   user: User;
 
-  @ManyToMany((type) => OrderItem, (orderItem) => orderItem.id)
+  @OneToMany((type) => OrderItem, (orderItem) => orderItem.id, { cascade: true })
   orderItems: OrderItem[];
 }
