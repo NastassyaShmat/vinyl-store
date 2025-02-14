@@ -21,9 +21,9 @@ export class Order {
   @Column({ type: 'varchar', name: 'comments', length: 500 })
   comments: string;
 
-  @ManyToOne((type) => User, (user) => user.id)
+  @ManyToOne((type) => User, (user) => user.id, { onDelete: 'CASCADE' })
   user: User;
 
-  @OneToMany((type) => OrderItem, (orderItem) => orderItem.id, { onDelete: 'CASCADE' })
+  @OneToMany((type) => OrderItem, (orderItem) => orderItem.id, { cascade: true })
   orderItems: OrderItem[];
 }

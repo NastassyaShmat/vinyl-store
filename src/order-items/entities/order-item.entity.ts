@@ -18,12 +18,12 @@ export class OrderItem {
   @Column({ type: 'date', name: 'order_date', nullable: false })
   date: Date;
 
-  @ManyToOne((type) => Record, (record) => record.id)
+  @ManyToOne((type) => Record, (record) => record.id, { onDelete: 'CASCADE' })
   record: Record;
 
-  @ManyToOne((type) => Order, (order) => order.id)
+  @ManyToOne((type) => Order, (order) => order.id, { onDelete: 'CASCADE' })
   order: Order;
 
-  @ManyToOne((type) => User, (user) => user.id)
+  @ManyToOne((type) => User, (user) => user.id, { onDelete: 'CASCADE' })
   user: User;
 }

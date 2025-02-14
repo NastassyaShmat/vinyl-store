@@ -58,13 +58,13 @@ export class User {
   @OneToMany(() => Rating, (rating) => rating.id)
   ratings: Rating[];
 
-  @OneToMany(() => Record, (record) => record.id, { onDelete: 'CASCADE' })
+  @OneToMany(() => Record, (record) => record.id, { cascade: true })
   records: Record[];
 
-  @OneToMany(() => Order, (order) => order.id, { onDelete: 'CASCADE' })
+  @OneToMany(() => Order, (order) => order.id, { cascade: true })
   orders: Order[];
 
-  @OneToMany(() => OrderItem, (orderItem) => orderItem.id, { onDelete: 'CASCADE' })
+  @OneToMany(() => OrderItem, (orderItem) => orderItem.id, { cascade: true })
   orderItems: OrderItem[];
 
   @BeforeInsert()
