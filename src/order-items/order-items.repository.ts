@@ -1,13 +1,14 @@
 import { InjectRepository } from '@nestjs/typeorm';
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 
-import { DataSource, DeleteResult, In, Repository } from 'typeorm';
+import { DataSource, DeleteResult, In, Repository, UpdateResult } from 'typeorm';
 
 import { Record } from 'src/records/entities/record.entity';
 import { User } from 'src/users/entities/user.entity';
 
 import { OrderItem } from './entities/order-item.entity';
 import { CreateOrderItemDto } from './dto/create-order-item.dto';
+import { UpdateOrderItemDto } from './dto/update-order-item.dto';
 
 @Injectable()
 export class OrderItemsRepository {
@@ -82,46 +83,8 @@ export class OrderItemsRepository {
     return orderItem;
   }
 
-  async update(
-    updateOrderItemContent: Array<{
-      orderItemId: number;
-      recordId: number;
-      orderItemQuantity: number;
-      recordQuantity: number;
-    }>,
-  ): Promise<void> {
-    const queryRunner = this.dataSource.createQueryRunner();
-
-    await queryRunner.connect();
-    await queryRunner.startTransaction();
-    try {
-      for (const orderItem of updateOrderItemContent) {
-        if (orderItem.recordQuantity < 0) {
-          throw new BadRequestException(`Can not create Order Item with such quantity`);
-        }
-
-        await queryRunner.manager
-          .createQueryBuilder()
-          .update(OrderItem)
-          .set({ quantity: orderItem.orderItemQuantity })
-          .where('id = :id', { id: orderItem.orderItemId })
-          .execute();
-
-        await queryRunner.manager
-          .createQueryBuilder()
-          .update(Record)
-          .set({ quantity: orderItem.recordQuantity })
-          .where('id = :id', { id: orderItem.recordId })
-          .execute();
-      }
-
-      await queryRunner.commitTransaction();
-    } catch (error) {
-      await queryRunner.rollbackTransaction();
-      throw error;
-    } finally {
-      await queryRunner.release();
-    }
+  async update(id: number, updateOrderItemContent: { quantity: number; totalPrice: number }): Promise<UpdateResult> {
+    return this.orderItemsRepository.update(id, updateOrderItemContent);
   }
 
   remove(userId: number, ids: number[]): Promise<DeleteResult> {

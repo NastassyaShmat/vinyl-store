@@ -12,7 +12,7 @@ import { OrderItem } from './entities/order-item.entity';
 
 import { DeleteOrderItemsDto } from './dto/delete-order-item.dto';
 import { CreateOrderItemDto } from './dto/create-order-item.dto';
-import { BulkUpdateOrderItemsDto, UpdateOrderItemDto } from './dto/update-order-item.dto';
+import { BulkUpdateOrderItemsDto } from './dto/update-order-item.dto';
 
 @Injectable()
 export class OrderItemsService {
@@ -54,40 +54,18 @@ export class OrderItemsService {
   }
 
   async updateMany(updateOrderItemDto: BulkUpdateOrderItemsDto): Promise<void> {
-    const recordIds: number[] = updateOrderItemDto.orderItems.map((orderItem) => orderItem.recordId);
-    const orderItemIds: number[] = updateOrderItemDto.orderItems.map((orderItem) => orderItem.orderItemId);
-    const recordsToUpdate: Record[] = await this.recordsService.find(recordIds);
-    const existingOrderItems: OrderItem[] = await this.orderItemsRepository.find(orderItemIds);
-    const recordIdQuantityMap: Map<number, number> = new Map<number, number>();
-    const oldOrderItemIdQuantityMap: Map<number, number> = new Map<number, number>();
-    const newOrderItemIdQuantityMap: Map<number, number> = new Map<number, number>();
+    if (!updateOrderItemDto.orderItems.length) {
+      throw new BadRequestException(`Bad request to update.`);
+    }
 
-    updateOrderItemDto.orderItems.forEach((orderItem) => {
-      newOrderItemIdQuantityMap.set(orderItem.recordId, orderItem.orderItemQuantity);
+    updateOrderItemDto.orderItems.forEach(async (orderItem) => {
+      return this.orderItemsRepository.update(orderItem.id, {
+        quantity: orderItem.quantity,
+        totalPrice: orderItem.totalPrice,
+      });
     });
 
-    existingOrderItems.forEach((orderItem) => {
-      oldOrderItemIdQuantityMap.set(orderItem.record.id, orderItem.quantity);
-    });
-
-    recordsToUpdate.forEach((record) => {
-      recordIdQuantityMap.set(
-        record.id,
-        oldOrderItemIdQuantityMap.get(record.id) + record.quantity - newOrderItemIdQuantityMap.get(record.id),
-      );
-    });
-
-    const updateOrderItemContent: Array<{
-      orderItemId: number;
-      recordId: number;
-      orderItemQuantity: number;
-      recordQuantity: number;
-    }> = updateOrderItemDto.orderItems.map((orderItem) => ({
-      ...orderItem,
-      recordQuantity: recordIdQuantityMap.get(orderItem.recordId),
-    }));
-
-    return this.orderItemsRepository.update(updateOrderItemContent);
+    return;
   }
 
   remove(userId: number, deleteOrderItemsDto: DeleteOrderItemsDto): Promise<DeleteResult> {
