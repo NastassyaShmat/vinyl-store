@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
-import { DataSource, Repository } from 'typeorm';
+import { DataSource, Repository, UpdateResult } from 'typeorm';
 
 import { Order } from './entities/order.entity';
 
@@ -108,11 +108,7 @@ export class OrdersRepository {
     return order;
   }
 
-  async updateOne(id: number, updateOrderDto: UpdateOrderDto): Promise<void> {
-    await this.ordersRepository.update(id, updateOrderDto);
-  }
-
-  async remove(id: number): Promise<void> {
-    await this.ordersRepository.delete(id);
+  updateOne(id: number, updateOrderDto: UpdateOrderDto): Promise<UpdateResult> {
+    return this.ordersRepository.update(id, updateOrderDto);
   }
 }

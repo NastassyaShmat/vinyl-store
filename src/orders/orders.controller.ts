@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Req, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Req, ParseIntPipe } from '@nestjs/common';
 import { Request } from 'express';
 
 import { Order } from './entities/order.entity';
@@ -35,12 +35,6 @@ export class OrdersController {
     @Body() updateOrderDto: UpdateOrderDto,
   ): Promise<{ status: string }> {
     await this.ordersService.update(id, updateOrderDto);
-    return { status: 'Success' };
-  }
-
-  @Delete(':id')
-  async remove(@Param('id', ParseIntPipe) id: number): Promise<{ status: string }> {
-    await this.ordersService.remove(id);
     return { status: 'Success' };
   }
 }

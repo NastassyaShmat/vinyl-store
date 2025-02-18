@@ -1,5 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 
+import { UpdateResult } from 'typeorm';
+
 import { OrdersRepository } from './orders.repository';
 import { Order } from './entities/order.entity';
 import { User } from 'src/users/entities/user.entity';
@@ -78,11 +80,7 @@ export class OrdersService {
     return this.ordersRepository.findOne(userId, id);
   }
 
-  update(id: number, updateOrderDto: UpdateOrderDto) {
-    return `This action updates a #${id} order`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} order`;
+  update(id: number, updateOrderDto: UpdateOrderDto): Promise<UpdateResult> {
+    return this.ordersRepository.updateOne(id, updateOrderDto);
   }
 }
