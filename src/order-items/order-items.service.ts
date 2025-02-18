@@ -12,7 +12,7 @@ import { OrderItem } from './entities/order-item.entity';
 
 import { DeleteOrderItemsDto } from './dto/delete-order-item.dto';
 import { CreateOrderItemDto } from './dto/create-order-item.dto';
-import { BulkUpdateOrderItemsDto, UpdateOrderItemDto } from './dto/update-order-item.dto';
+import { BulkUpdateOrderItemsDto } from './dto/update-order-item.dto';
 
 @Injectable()
 export class OrderItemsService {
@@ -51,6 +51,10 @@ export class OrderItemsService {
 
   findOne(id: number): Promise<OrderItem> {
     return this.orderItemsRepository.findOne(id);
+  }
+
+  getOrderItemsById(ids: number[]): Promise<OrderItem[]> {
+    return this.orderItemsRepository.find(ids);
   }
 
   async updateMany(updateOrderItemDto: BulkUpdateOrderItemsDto): Promise<void> {

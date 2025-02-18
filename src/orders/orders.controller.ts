@@ -1,5 +1,9 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Req, ParseIntPipe } from '@nestjs/common';
+import { Request } from 'express';
+
+import { Order } from './entities/order.entity';
 import { OrdersService } from './orders.service';
+
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 
@@ -8,27 +12,35 @@ export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
 
   @Post()
-  create(@Body() createOrderDto: CreateOrderDto) {
-    return this.ordersService.create(createOrderDto);
+  create(@Req() req: Request, @Body() createOrderDto: CreateOrderDto): Promise<Order> {
+    const userId: number = req.user['id'];
+    return this.ordersService.create(userId, createOrderDto);
   }
 
   @Get()
-  findAll() {
-    return this.ordersService.findAll();
+  async findAll(@Req() req: Request): Promise<Order[]> {
+    const userId: number = req.user['id'];
+    return this.ordersService.findAll(userId);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.ordersService.findOne(+id);
+  async findOne(@Req() req: Request, @Param('id', ParseIntPipe) id: number): Promise<Order> {
+    const userId: number = await req.user['id'];
+    return this.ordersService.findOne(userId, id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateOrderDto: UpdateOrderDto) {
-    return this.ordersService.update(+id, updateOrderDto);
+  async update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateOrderDto: UpdateOrderDto,
+  ): Promise<{ status: string }> {
+    await this.ordersService.update(id, updateOrderDto);
+    return { status: 'Success' };
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.ordersService.remove(+id);
+  async remove(@Param('id', ParseIntPipe) id: number): Promise<{ status: string }> {
+    await this.ordersService.remove(id);
+    return { status: 'Success' };
   }
 }

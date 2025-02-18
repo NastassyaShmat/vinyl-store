@@ -19,34 +19,7 @@ export class OrderItemsRepository {
   async create(
     createOrderItemContent: CreateOrderItemDto & { user: User; record: Record; totalPrice: number; date: Date },
   ): Promise<OrderItem> {
-    const orderItem: OrderItem = this.orderItemsRepository.create(createOrderItemContent);
-    const queryRunner = this.dataSource.createQueryRunner();
-
-    await queryRunner.connect();
-    await queryRunner.startTransaction();
-    try {
-      if (createOrderItemContent.record.quantity - createOrderItemContent.quantity < 0) {
-        throw new BadRequestException(`Can not create Order Item with such quantity`);
-      }
-
-      await queryRunner.manager.save(orderItem);
-      await queryRunner.manager
-        .createQueryBuilder()
-        .update(Record)
-        .set({
-          quantity: createOrderItemContent.record.quantity - createOrderItemContent.quantity,
-        })
-        .where('id = :id', { id: createOrderItemContent.recordId })
-        .execute();
-
-      await queryRunner.commitTransaction();
-    } catch (error) {
-      await queryRunner.rollbackTransaction();
-      throw error;
-    } finally {
-      await queryRunner.release();
-    }
-    return orderItem;
+    return this.orderItemsRepository.save(createOrderItemContent);
   }
 
   findAll(userId: number): Promise<OrderItem[]> {

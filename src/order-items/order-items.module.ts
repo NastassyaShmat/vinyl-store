@@ -13,5 +13,6 @@ import { OrderItemsRepository } from './order-items.repository';
   imports: [TypeOrmModule.forFeature([OrderItem]), UsersModule, RecordsModule],
   controllers: [OrderItemsController],
   providers: [OrderItemsService, OrderItemsRepository],
+  exports: [OrderItemsService],
 })
 export class OrderItemsModule {}
