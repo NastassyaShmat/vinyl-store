@@ -6,17 +6,18 @@ export class UpdateOrderItemDto {
   @IsNumber()
   @IsPositive()
   @Min(1)
-  readonly orderItemQuantity: number;
+  readonly quantity: number;
 
   @ApiProperty()
   @IsNumber()
   @IsPositive()
-  readonly orderItemId: number;
+  @Min(1)
+  readonly totalPrice: number;
 
   @ApiProperty()
   @IsNumber()
   @IsPositive()
-  readonly recordId: number;
+  readonly id: number;
 }
 
 export class BulkUpdateOrderItemsDto {
