@@ -1,4 +1,4 @@
-name: Lint
+name: Test
 
 # Trigger the workflow on push or pull request to the main branch
 on:
@@ -37,5 +37,5 @@ jobs:
         run: npm install
 
       # Run the linter
-      - name: Run ESLint
-        run: npm run lint
+      - name: Run tests
+        run: npm run test
