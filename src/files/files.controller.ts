@@ -26,7 +26,7 @@ export class FilesController {
     type: UploadFileDto,
   })
   @UseInterceptors(FileInterceptor('file'))
-  create(@Param('id', ParseIntPipe) id: number, @UploadedFile() file: Express.Multer.File) {
+  create(@Param('id', ParseIntPipe) id: number, @UploadedFile() file) {
     return this.filesService.create(id, file.buffer);
   }
 
