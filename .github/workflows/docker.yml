@@ -21,18 +21,18 @@ jobs:
 
       - name: Set Branch Name
         id: set_branch
-        run: echo "branch=${{ github.ref }}" >> $GITHUB_OUTPUT
+        run: echo "branch=$(echo "${{ github.ref_name }}" | tr / -) >> $GITHUB_OUTPUT
 
       - name: Set Commit SHA
         id: set_sha
-        run: echo "commit_sha=$(git rev-parse --short=7 ${{ github.event.before }})" >> $GITHUB_OUTPUT
+        run: echo "commit_sha=${{ github.event.before }}" >> $GITHUB_OUTPUT
 
       - name: Set Tags
         id: set_tags
         run: |
           BRANCH_TAG="${{ steps.set_branch.outputs.branch }}"
           COMMIT_TAG="${{ steps.set_sha.outputs.commit_sha }}"
-          TAGS="$BRANCH_TAG,$COMMIT_TAG"
+          TAGS="$BRANCH_TAG-$COMMIT_TAG:0:7"
           echo "tags=$TAGS" >> $GITHUB_OUTPUT
 
       - name: Debug Tags
@@ -49,7 +49,7 @@ jobs:
 
       - name: Build Docker Image
         run: |
-          IFS=',' read -r -a TAG_ARRAY <<< "${{ steps.set_tags.outputs.tags }}"
+          IFS='-' read -r -a TAG_ARRAY <<< "${{ steps.set_tags.outputs.tags }}"
           TAG_ARGS=""
           for tag in "${TAG_ARRAY[@]}"; do
             TAG_ARGS="$TAG_ARGS -t ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPOSITORY }}:$tag"
@@ -59,7 +59,7 @@ jobs:
 
       - name: Push Docker Image
         run: |
-          IFS=',' read -r -a TAG_ARRAY <<< "${{ steps.set_tags.outputs.tags }}"
+          IFS='-' read -r -a TAG_ARRAY <<< "${{ steps.set_tags.outputs.tags }}"
           for tag in "${TAG_ARRAY[@]}"; do
             docker push ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPOSITORY }}:$tag
             echo "Push Docker Image with tag $tag"
