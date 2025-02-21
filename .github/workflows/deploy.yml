@@ -1,19 +1,17 @@
 name: Deploy
 
 on:
-  push:
-    branches: develop
-
-  workflow_dispatch:
-    inputs:
-      tag:
-        description: 'Docker Image Tag to Deploy'
-        required: true
+  workflow_run:
+    workflows: [Docker]
+    types:
+      - completed
 
 jobs:
   deploy:
     name: Deploy to Cloud Run
     runs-on: ubuntu-latest
+
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
 
     steps:
       - name: Checkout Repository
