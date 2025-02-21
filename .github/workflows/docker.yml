@@ -25,14 +25,14 @@ jobs:
 
       - name: Set Commit SHA
         id: set_sha
-        run: echo "commit_sha=${{ github.event.before }}" >> $GITHUB_OUTPUT
+        run: echo "commit_sha=$(git rev-parse --short=7 ${{github.event.before }})" >> $GITHUB_OUTPUT
 
       - name: Set Tags
         id: set_tags
         run: |
           BRANCH_TAG="${{ steps.set_branch.outputs.branch }}"
           COMMIT_TAG="${{ steps.set_sha.outputs.commit_sha }}"
-          TAGS="$BRANCH_TAG-$COMMIT_TAG:0:7"
+          TAGS="$BRANCH_TAG-$COMMIT_TAG"
           echo "tags=$TAGS" >> $GITHUB_OUTPUT
 
       - name: Debug Tags
