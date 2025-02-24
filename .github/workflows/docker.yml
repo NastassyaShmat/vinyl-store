@@ -62,5 +62,17 @@ jobs:
           IFS='-' read -r -a TAG_ARRAY <<< "${{ steps.set_tags.outputs.tags }}"
           for tag in "${TAG_ARRAY[@]}"; do
             docker push ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPOSITORY }}:$tag
+            # echo "Generated tag: $TAG"
+            # echo "TAG=$tag" >> $GITHUB_ENV  
+            # echo "Save tag as environment variable"
             echo "Push Docker Image with tag $tag"
           done
+
+      # - name: Save Docker tag
+      #   run: echo "${{ env.TAG }}" > docker-tag.txt
+
+      # - name: Upload Docker tag
+      #   uses: actions/upload-artifact@v3
+      #   with:
+      #     name: docker-tag
+      #     path: docker-tag.txt
