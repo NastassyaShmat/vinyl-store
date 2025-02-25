@@ -1,9 +1,10 @@
 name: Deploy
 
 on:
-  workflow_run:
-    workflows: ['Docker']
-    types: [completed]
+  push:
+    # workflow_run:
+    #   workflows: ['Docker']
+    #   types: [completed]
     branches:
       - develop
 
@@ -11,7 +12,7 @@ jobs:
   deploy:
     name: Deploy to Cloud Run
     runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    # if: ${{ github.event.workflow_run.conclusion == 'success' }}
 
     steps:
       - name: Checkout Repository
@@ -34,23 +35,27 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      # - name: Download Docker tag
-      #   uses: actions/download-artifact@v3
-      #   with:
-      #     name: docker-tag
-      #     path: .
+      - name: Download Docker tag
+        uses: actions/download-artifact@v3
+        with:
+          name: docker-tag
+          path: .
 
-      # - name: Read Docker tag
-      #   id: docker-tag
-      #   run: |
-      #     TAG=$(cat docker-tag.txt)
-      #     echo "Using Docker tag: $TAG"
-      #     echo "TAG=$TAG" >> $GITHUB_ENV
+      - name: Read Docker tag
+        id: docker-tag
+        run: |
+          TAG=$(cat docker-tag.txt)
+          echo "Using Docker tag: $TAG"
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+
+      - name: Debug Tag
+        run: |
+          echo "Docker Image Tag: ${{ steps.docker-tag.outputs.tag }}"
 
       - name: Deploy to Cloud Run
         run: |
           gcloud run deploy ${{ secrets.CLOUD_RUN_SERVICE_NAME }} \
-            --image=docker.io/${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPOSITORY }}:${{ github.event.inputs.tag }} \
+            --image=docker.io/${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPOSITORY }}:${{ steps.docker-tag.outputs.tag }} \
             --platform managed \
             --region ${{ secrets.CLOUD_RUN_REGION }} \
             --allow-unauthenticated \
