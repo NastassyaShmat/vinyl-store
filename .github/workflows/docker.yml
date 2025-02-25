@@ -42,3 +42,14 @@ jobs:
         run: |
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPOSITORY }}:${{ steps.set_sha.outputs.commit_sha }}
           echo "Push Docker Image with tag $tag"
+
+      # - name: Save Docker Tag
+      #   env:
+      #     TAG: ${{ steps.set_sha.outputs.commit_sha }}
+      #   run: |
+      #     mkdir -p ./artifact
+      #     echo $TAG > ./artifact/docker_tag
+      # - uses: actions/upload-artifact@v4
+      #   with:
+      #     name: docker-tag
+      #     path: artifact/

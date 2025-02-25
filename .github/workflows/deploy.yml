@@ -36,11 +36,11 @@ jobs:
 
       - name: Set Commit SHA as Tag
         id: set_sha
-        run: echo "commit_sha=$(git rev-parse --short=7 ${{github.sha }})" >> $GITHUB_OUTPUT
+        run: echo "commit_sha=$(git rev-parse --short=7 ${{github.event.workflow_run.head_commit }})" >> $GITHUB_OUTPUT
 
-      - name: Debug Tags
+      - name: Debug Tag
         run: |
-          echo "Commit Tag: ${{ steps.set_sha.outputs.commit_sha }}"
+          echo "Docker Image Tag: ${{ steps.set_sha.outputs.commit_sha }}"
 
       - name: Deploy to Cloud Run
         run: |
