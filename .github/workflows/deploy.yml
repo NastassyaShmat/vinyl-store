@@ -1,10 +1,9 @@
 name: Deploy
 
 on:
-  push:
-    # workflow_run:
-    #   workflows: ['Docker']
-    #   types: [completed]
+  workflow_run:
+    workflows: ['Docker']
+    types: [completed]
     branches:
       - develop
 
@@ -12,7 +11,7 @@ jobs:
   deploy:
     name: Deploy to Cloud Run
     runs-on: ubuntu-latest
-    # if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
 
     steps:
       - name: Checkout Repository
