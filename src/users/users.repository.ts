@@ -1,31 +1,64 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+
+import { DeleteResult, Repository, UpdateResult } from 'typeorm';
+
+import { User } from './entities/user.entity';
+
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { InjectRepository } from '@nestjs/typeorm';
-import { User } from './entities/user.entity';
-import { Repository } from 'typeorm';
 
 @Injectable()
 export class UsersRepository {
-	constructor(@InjectRepository(User) private usersRepository: Repository<User>) {}
+  constructor(@InjectRepository(User) private usersRepository: Repository<User>) {}
 
-  create(createUserDto: CreateUserDto) {
-    return 'This action adds a new record';
+  async create(createUserDto: CreateUserDto): Promise<User> {
+    const user: User = await this.usersRepository.create(createUserDto);
+    return this.usersRepository.save(user);
   }
 
-  findAll() {
-    return `This action returns all records`;
+  findAll(): Promise<User[]> {
+    return this.usersRepository.find({
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+      },
+      order: {
+        firstName: 'ASC',
+      },
+      skip: 0,
+      take: 10,
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} record`;
+  findOneByEmail(email: string): Promise<User | null> {
+    return this.usersRepository.findOneBy({ email });
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} record`;
+  // should return relations too
+  async findOne(id: number): Promise<User> {
+    const user: User = await this.usersRepository.findOne({
+      where: { id },
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+      },
+    });
+
+    if (!user) {
+      throw new NotFoundException(`User with identifier ${id} does not exist.`);
+    }
+
+    return user;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} record`;
+  updateOne(id: number, updateUserDto: UpdateUserDto): Promise<UpdateResult> {
+    return this.usersRepository.update(id, updateUserDto);
+  }
+
+  async remove(id: number): Promise<DeleteResult> {
+    return this.usersRepository.delete({ id });
   }
 }

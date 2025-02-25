@@ -1,11 +1,14 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { BeforeInsert, BeforeUpdate, Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { IsEmail } from 'class-validator';
+import { Exclude } from 'class-transformer';
 
 import { UserRole } from 'src/enums';
+import { Crypto } from 'src/utils/crypto.service';
 import { Comment } from 'src/comments/entities/comment.entity';
 import { Order } from 'src/orders/entities/order.entity';
 import { Rating } from 'src/ratings/entities/rating.entity';
 import { Record } from 'src/records/entities/record.entity';
+import { OrderItem } from 'src/order-items/entities/order-item.entity';
 
 @Entity({ name: 'users' })
 export class User {
@@ -28,14 +31,18 @@ export class User {
   @Column({ type: 'varchar', name: 'last_name', length: 50, nullable: false })
   lastName: string;
 
-  @Column({ type: 'varchar', name: 'phone_number', length: 10 })
+  @Column({ type: 'varchar', name: 'phone_number', length: 15 })
   phoneNumber: string;
 
-  @Column({ type: 'varchar', name: 'birth_date', length: 10 })
+  @Column({ type: 'varchar', name: 'birth_date', length: 12 })
   birthDate: string;
 
   @Column({ type: 'varchar', name: 'password', length: 255 })
+  @Exclude()
   password: string;
+
+  @Column({ type: 'boolean', name: 'is_verified', default: false, nullable: false })
+  isVerified: boolean;
 
   @Column({
     type: 'enum',
@@ -45,15 +52,26 @@ export class User {
   })
   role: UserRole;
 
-  @OneToMany((type) => Comment, (comment) => comment.id)
+  @OneToMany(() => Comment, (comment) => comment.id)
   comments: Comment[];
 
-  @OneToMany((type) => Rating, (rating) => rating.id)
+  @OneToMany(() => Rating, (rating) => rating.id)
   ratings: Rating[];
 
-  @OneToMany((type) => Record, (record) => record.id, { onDelete: 'CASCADE' })
+  @OneToMany(() => Record, (record) => record.id, { cascade: true })
   records: Record[];
 
-  @OneToMany((type) => Order, (order) => order.id, { onDelete: 'CASCADE' })
+  @OneToMany(() => Order, (order) => order.id, { cascade: true })
   orders: Order[];
+
+  @OneToMany(() => OrderItem, (orderItem) => orderItem.id, { cascade: true })
+  orderItems: OrderItem[];
+
+  @BeforeInsert()
+  @BeforeUpdate()
+  async hashPassword() {
+    if (this.password.length) {
+      this.password = await Crypto.getEncryptedString(this.password);
+    }
+  }
 }

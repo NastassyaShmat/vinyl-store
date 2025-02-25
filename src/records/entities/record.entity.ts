@@ -1,4 +1,4 @@
-import { Column, Entity, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 import { Comment } from 'src/comments/entities/comment.entity';
 import { Rating } from 'src/ratings/entities/rating.entity';
@@ -25,26 +25,26 @@ export class Record {
   @Column({ type: 'varchar', name: 'genre', length: 255, nullable: false })
   genre: string;
 
-  @Column({ type: 'integer', name: 'released_year' })
+  @Column({ type: 'integer', name: 'released_year', nullable: false })
   releasedYear: number;
 
-  @Column({ type: 'varchar', name: 'image' })
+  @Column({ type: 'varchar', name: 'image', nullable: true })
   image: string;
 
-  @Column({ type: 'varchar', name: 'description', length: 500 })
+  @Column({ type: 'varchar', name: 'description', length: 500, nullable: true })
   description: string;
 
   @OneToMany((type) => Comment, (comment) => comment.id, {
-    onDelete: 'CASCADE',
+    cascade: true,
   })
   comments: Comment[];
 
-  @OneToMany((type) => Rating, (rating) => rating.id, { onDelete: 'CASCADE' })
+  @OneToMany((type) => Rating, (rating) => rating.id, { cascade: true })
   ratings: Rating[];
 
-  @ManyToOne((type) => User, (user) => user.id)
+  @ManyToOne((type) => User, (user) => user.id, { onDelete: 'CASCADE' })
   user: User;
 
-  @ManyToMany((type) => OrderItem, (orderItem) => orderItem.id)
+  @OneToMany((type) => OrderItem, (orderItem) => orderItem.id, { cascade: true })
   orderItems: OrderItem[];
 }
