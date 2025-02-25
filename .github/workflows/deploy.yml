@@ -36,7 +36,7 @@ jobs:
 
       - name: Set Commit SHA as Tag
         id: set_sha
-        run: echo "commit_sha=$(git rev-parse --short=7 ${{github.event.workflow_run.head_commit.id }})" >> $GITHUB_OUTPUT
+        run: echo "commit_sha=$(git rev-parse --short=7 ${{github.event.workflow_run.head_sha }})" >> $GITHUB_OUTPUT
 
       - name: Debug Tag
         run: |
