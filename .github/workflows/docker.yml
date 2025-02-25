@@ -32,7 +32,7 @@ jobs:
         run: |
           BRANCH_TAG="${{ steps.set_branch.outputs.branch }}"
           COMMIT_TAG="${{ steps.set_sha.outputs.commit_sha }}"
-          TAG="${$BRANCH_TAG}.${COMMIT_TAG}"
+          TAG="${$BRANCH_TAG}-${COMMIT_TAG}"
           echo "tag=$TAG" >> $GITHUB_OUTPUT
 
       - name: Debug Tags
