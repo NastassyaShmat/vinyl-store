@@ -3,8 +3,7 @@ name: Deploy
 on:
   workflow_run:
     workflows: ['Docker']
-    types:
-      - completed
+    types: [completed]
     branches:
       - develop
 
@@ -12,11 +11,9 @@ jobs:
   deploy:
     name: Deploy to Cloud Run
     runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
 
     steps:
-      - name: Debug GitHub context
-        run: echo "${{ toJson(github) }}"
-
       - name: Checkout Repository
         uses: actions/checkout@v4
 
