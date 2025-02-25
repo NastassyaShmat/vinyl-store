@@ -68,9 +68,6 @@ jobs:
             echo "Push Docker Image with tag $tag"
           done
 
-      - name: Debug GitHub context
-        run: echo "${{ toJson(github) }}"
-
       # - name: Save Docker tag
       #   run: echo "${{ env.TAG }}" > docker-tag.txt
 
