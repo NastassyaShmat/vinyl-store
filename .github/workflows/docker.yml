@@ -21,7 +21,7 @@ jobs:
 
       - name: Set Commit SHA as Tag
         id: set_sha
-        run: echo "commit_sha=$(git rev-parse --short=7 ${{github.event.before }})" >> $GITHUB_OUTPUT
+        run: echo "commit_sha=$(git rev-parse --short=7 ${{github.sha }})" >> $GITHUB_OUTPUT
 
       - name: Debug Tags
         run: |
