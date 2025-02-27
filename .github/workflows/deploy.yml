@@ -50,4 +50,4 @@ jobs:
             --platform managed \
             --region ${{ secrets.CLOUD_RUN_REGION }} \
             --allow-unauthenticated \
-            --set-env-vars PORT=3000,DB_USERNAME=${{ secrets.DB_USERNAME }},DB_PASSWORD=${{ secrets.DB_PASSWORD }},DB_NAME=${{ secrets.DB_NAME }},DB_HOST=${{ secrets.DB_HOST }},JWT_SECRET=${{ secrets.JWT_SECRET }}
+            --set-env-vars DB_USERNAME=${{ secrets.DB_USERNAME }},DB_PASSWORD=${{ secrets.DB_PASSWORD }},DB_NAME=${{ secrets.DB_NAME }},DB_HOST=${{ secrets.DB_HOST }},JWT_SECRET=${{ secrets.JWT_SECRET }}
