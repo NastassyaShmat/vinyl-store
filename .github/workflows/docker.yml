@@ -36,12 +36,12 @@ jobs:
       - name: Build Docker Image
         run: |
           docker build \
-          --build-args DB_HOST=${{ secrets.DB_HOST }} \
-          --build-args DB_PORT=${{ secrets.DB_PORT }} \
-          --build-args DB_USERNAME=${{ secrets.DB_USERNAME }} \
-          --build-args DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
-          --build-args DB_NAME=${{ secrets.DB_NAME }} \
-          --build-args JWT_SECRET=${{ secrets.JWT_SECRET }} \
+          --build-arg DB_HOST=${{ secrets.DB_HOST }} \
+          --build-arg DB_PORT=${{ secrets.DB_PORT }} \
+          --build-arg DB_USERNAME=${{ secrets.DB_USERNAME }} \
+          --build-arg DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
+          --build-arg DB_NAME=${{ secrets.DB_NAME }} \
+          --build-arg JWT_SECRET=${{ secrets.JWT_SECRET }} \
           -t ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPOSITORY }}:${{ steps.set_sha.outputs.commit_sha }} .
           echo "Build Docker Image with tag $tag"
 
