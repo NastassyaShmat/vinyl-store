@@ -23,5 +23,27 @@ COPY --from=builder /home/node/app/node_modules ./node_modules
 
 COPY --from=builder /home/node/app/dist ./dist
 
+
+ARG DB_HOST
+ENV DB_HOST=${DB_HOST}
+
+ARG DB_PORT
+ENV DB_PORT=${DB_PORT}
+
+ARG DB_USERNAME
+ENV DB_USERNAME=${DB_USERNAME}
+
+ARG DB_PASSWORD
+ENV DB_PASSWORD=${DB_PASSWORD}
+
+ARG DB_NAME
+ENV DB_NAME=${DB_NAME}
+
+ARG JWT_SECRET
+ENV JWT_SECRET=${JWT_SECRET}
+
+ARG NODE_ENV
+ENV NODE_ENV=${NODE_ENV:-production}
+
 EXPOSE 3000
 CMD [ "node", "dist/main" ]
